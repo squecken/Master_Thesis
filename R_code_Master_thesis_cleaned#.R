@@ -1,32 +1,32 @@
-#Required Packages
-library("ggplot2")
-library("ggsci")
-library("tidyverse")
-library("dplyr")
-library("ltm")
-library("ggthemes")  
-library("dunn.test")
-library("ineq")
-library("Hmisc")
-library("colorspace")
-library("RColorBrewer")
-library("gridExtra")
-library("grid")
-library("papaja")
-library('performance')
-library('see')
-library('rempsyc')
-library("stargazer")
-library("tidyverse")
-library("RNHANES")
-library("tableone")
-library("labelled")
-library("nhanesA")
-library("lmtest")
-library("broom")
-library("sandwich")
-library("car")
-library("pscl")
+# Required Packages
+library("ggplot2")       # Hadley Wickham (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York.
+library("ggsci")         # Nan Xiao (2018). ggsci: Scientific Journal and Sci-Fi Themed Color Palettes for 'ggplot2'. R package version 2.9.
+library("dplyr")         # Hadley Wickham, Romain François, Lionel Henry, Kirill Müller, and R Core Team (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.7.
+library("ltm")           # Dimitris Rizopoulos (2006). ltm: An R Package for Latent Variable Modeling and Item Response Theory Analyses. Journal of Statistical Software, 17(5), 1-25.
+library("ggthemes")      # Jeffrey B. Arnold (2021). ggthemes: Extra Themes, Scales and Geoms for 'ggplot2'. R package version 4.2.4.
+library("dunn.test")     # Christian Osorio (2015). dunn.test: Dunn's Test of Multiple Comparisons Using Rank Sums. R package version 1.3.5.
+library("ineq")          # Achim Zeileis, (2014). ineq: Measuring Inequality, Concentration, and Poverty. R package version 0.2-13.
+library("Hmisc")         # Frank E Harrell Jr, with contributions from Charles Dupont and many others (2020). Hmisc: Harrell Miscellaneous. R package version 4.4-2.
+library("colorspace")    # Achim Zeileis, Reto Stauffer (2018). colorspace: A Toolbox for Manipulating and Assessing Colors and Palettes. R package version 2.0-1.
+library("RColorBrewer")  # Erich Neuwirth (2014). RColorBrewer: ColorBrewer Palettes. R package version 1.1-2.
+library("gridExtra")     # Baptiste Auguie (2017). gridExtra: Miscellaneous Functions for "Grid" Graphics. R package version 2.3.
+library("grid")          # R Core Team (2021). grid: The Grid Graphics Package. R package version 4.1.0.
+library("papaja")        # Frederik Aust, Marius Barth, Marius Bartling (2021). papaja: Prepare and Format 'APA' Style Manuscripts. R package version 0.1.0.9997.
+library('performance')   # Max Kuhn (2021). performance: Assessment of Regression Models Performance. R package version 0.9.5.
+library('see')           # Marc Ole Bulling, Anthony Bagnall, Wei Cui, Nathalie Japkowicz, Nathan Kirkpatrick, Marios N. Koufaris, Qiang Liu, Thomas B. Passin, Jian Pei, Jeannie Rakowski, Rob Safranek, Warren Ward, Xiaohui Yan (2015). see: Visualisation Toolbox for 'eXtreme' Events. R package version 1.8.
+library('rempsyc')       # Lee J. Cronbach and Michael W. Waller (1951). Remedial Education: A Report of the Developmental Study. Wiley.
+library("stargazer")     # Marek Hlavac (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version 5.2.2.
+library("tidyverse")     # Hadley Wickham (2019). tidyverse: Easily Install and Load the 'Tidyverse'. R package version 1.3.1.
+library("RNHANES")       # National Center for Health Statistics (2016). RNHANES: Facilitates Analysis of CDC NHANES Data. R package version 1.1.4.
+library("tableone")      # Tom J. Pollard, Alistair E.W. Johnson, Jesse D. Raffa, Roger G. Mark (2021). tableone: Create 'Table 1' to Describe Baseline Characteristics. R package version 0.12.0.
+library("labelled")      # Jason Bryer, Dason Kurkiewicz (2021). labelled: Manipulating Labelled Data. R package version 2.11.0.
+library("nhanesA")       # Stephanie Kovalchik (2016). nhanesA: NHANES Data Retrieval. R package version 0.7.1.
+library("lmtest")        # Torsten Hothorn and Achim Zeileis (2021). lmtest: Testing Linear Regression Models. R package version 0.9-39.
+library("broom")         # David Robinson (2017). broom: Convert Statistical Analysis Objects into Tidy Tibbles. R package version 0.7.9.
+library("sandwich")      # Achim Zeileis (2004). sandwich: Robust Covariance Matrix Estimators. R package version 3.0-2.
+library("car")           # John Fox and Sanford Weisberg (2019). car: Companion to Applied Regression. R package version 3.0-10.
+library("pscl")          # Simon Jackman (2017). pscl: Political Science Computational Laboratory. R package version 1.5.5.
+
 
 ##################################################################################################################
 #Upload data
@@ -48,18 +48,16 @@ my_colors = c("Baseline" = "steelblue", "Inequality" ="#D95F02")
 
 #########################Diagnostics################################################################
 
-#Indices 
+#Indices check for internal consistency 
 
 #Individual
 #Communication
 cor(data$Group_agreed,data$Group_communication) 
-
 df1=data[c("Group_agreed","Group_communication")]
 cronbach.alpha(df1) 
 
 #Cooperation
 cor(data$Cooperation_self_without_score,data$Group_cooperation_score)
-
 df2=data[c("Cooperation_self_without_score","Group_cooperation_score")]
 cronbach.alpha(df2) 
 
@@ -89,7 +87,7 @@ cor(df6)
 
 #######################################Descriptive Statistics###################################################
 
-# Perform Shapiro-Wilk test for each group
+#Perform Shapiro-Wilk test for each group
 group_names = unique(data$Treatment)
 
 #Normality Individual-level
@@ -179,6 +177,7 @@ names(normality_test_total_payoff2) = group_names
 print(normality_test_total_payoff2)
 
 #Summary Table Participant Pool individual-level 
+
 summary=data %>% 
   dplyr::select(c("Age","Treatment","Gender","WEIRD_country", "Education","Study_field_economics","Inequality_aversion","Total_payoff","Individual_overexploitation","Disadvantageous_inequality_aversion","Advantageous_inequality_aversion","Error_rate"))
 
@@ -197,7 +196,7 @@ tableone_group = CreateTableOne(data=summary2, vars = c("Average_age","Gender_co
 
 print(tableone_group,showAllLevels = TRUE, nonnormal = c("Average_age","Gender_composition","WEIRD_index","Disadvantageous_inequality_aversion_average","Average_individual_payoff"))
 
-#Double-check
+#Manual Hypothesis tests to double-check results
 
 #Age
 wilcox.test(group$Average_age~group$Treatment)
@@ -325,7 +324,6 @@ filtered_countries2 = subset(data_inequality$Nationality, !(data_inequality$Nati
 filtered_countries2=data_frame(filtered_countries2)
 
 summary_countries2 = table(filtered_countries2)
-
 Summary_percentage2=prop.table(summary_countries2)*100
 
 #Grouping
@@ -353,7 +351,6 @@ filtered_countries = subset(data_baseline$Nationality, !(data_baseline$Nationali
 filtered_countries=data_frame(filtered_countries)
 
 summary_countries = table(filtered_countries)
-
 Summary_percentage=prop.table(summary_countries)*100
 
 #Grouping
@@ -519,24 +516,6 @@ separation_line = rectGrob(
 ## Arrange the plots vertically
 grid.arrange(plot_baseline, separation_line, plot_inequality, ncol = 1,heights = c(4, 0.2, 4))
 
-#######################Interaction over time###################################################
-
-Resource_size_time=read.csv(file.choose(), sep = ';')
-
-# Reshape the data to long format and infer round numbers from column names
-long_dataset = 
-  Resource_size_time %>%
-  gather(Stock_size, stock_size, starts_with("Stock_size_")) %>%
-  mutate(round_number = as.numeric(gsub("Stock_size_", "", Stock_size)))
-
-# Perform linear regression with fixed effects and quadratic term
-reg_model = lm(stock_size ~ Treatment + round_number + I(round_number^2) + Treatment:round_number + Treatment:I(round_number^2), data = long_dataset)
-
-# Obtain robust standard errors
-robust_se = sqrt(diag(vcovHC(reg_model, type = "HC1")))
-
-# Display the regression results
-summary(reg_model)
 
 #######################################################Comparing Averages and Proportions on selected variables across treatment##################
 
@@ -640,7 +619,7 @@ ggplot(positive_overexploitation, aes(x = Round_number, y = Average_Overexploita
   theme_apa() +
   scale_fill_discrete(name = "Treatment", labels = c("Baseline", "Inequality")) +scale_x_continuous(breaks = 1:12, labels = paste(1:12)) +scale_fill_manual(values = my_colors) 
 
-###########################################################Inferential Statistics######################################################################################
+###########################################################Hypotheses######################################################################################
 
 #Hypothesis 1
 
@@ -673,9 +652,9 @@ prop.table(Table_Threshold,margin = 1)
 #Threshold Crossing 
 chisq.test(Proportions$Treatment, Proportions$Threshold_crossed, correct=T)
 
-######Check number of rounds##########
+######Check number of rounds
 
-#visualization with boxplot ###
+#visualization with boxplot
 ggplot(group,aes(x=Treatment,y=Rounds_before_threshold))+geom_boxplot()+ theme_apa()+labs(y="Number of rounds before threshold crossing", x="Treatment")
 
 #Normality Check 
@@ -697,7 +676,7 @@ mean_by_treatment = group %>%
   group_by(Treatment) %>%
   summarise(Median = mean(Rounds_before_threshold))
 
-#########Hypothesis 2 #########################
+#####################################################Hypothesis 2 ####################################################################
 
 Data_inequality=data[data$Treatment=="Inequality",]
 View(Data_inequality)
@@ -751,7 +730,7 @@ ggplot(average_deviations2, aes(x = Round, y = Optimal_Claim, group = Harvest_re
   labs(x = "Round", y = "Optimal Claim Difference",color="Adaptive Capacity") +
   scale_color_manual(values = c("LAC" = "steelblue", "HAC" = "#D95F02","Baseline"="purple")) +geom_hline(yintercept = 0, linetype = "dashed", color = "black")+scale_x_discrete(labels = round_labels)+theme_apa()
 
-###regression to account for group effects ###
+###regression to account for group effects
 
 # Fit regression model
 reg_inequality_harvest = lm(Average_harvest_threshold~ Harvest_restriction+WEIRD_country+Age+Gender.composition, data = Data_inequality)
@@ -902,7 +881,7 @@ plot(reg_inequality_harvest_coop3,5)
 #6.Multicollinearity
 vif(reg_inequality_harvest_coop3)
 
-######################Hypothesis 3 ###############################################
+################################################################Hypothesis 3 ##############################################################
 reg_Inequality_aversion_harvest= lm(Average_harvest_threshold ~ Inequality_aversion*Treatment+WEIRD_country+Age+Gender.composition,data = data)
 summary(reg_Inequality_aversion_harvest)
 
@@ -949,7 +928,7 @@ interaction.plot(x.factor = data$Inequality_aversion,
 axis(1, at = c(1, 2, 3,4,5), labels = c("1", "2", "3","4","5"))
 axis(2)
 
-########################Hypothesis 4############################################
+##############################################################Hypothesis 4##########################################################
 
 #Calculate GINI for treatment with harvest before threshold but this is not a mean measure 
 gini_coefficients = tapply(data$Harvest_threshold, data$Treatment, Gini)
@@ -964,7 +943,6 @@ gini_data = data %>%
 
 #Add this to the group dataset as a new column called GINI 
 names(group)[names(group) == "Group_session"] = "Session"
-
 Group_with_GINI= merge(group, gini_data, by = "Session", all.x = TRUE)
 
 #Check normality
@@ -976,7 +954,6 @@ print(normality_test_GINI)
 # Perform Wilcoxon rank-sum test for two treatments
 group_baseline =Group_with_GINI$Gini_Coefficient[Group_with_GINI$Treatment == "Baseline"]
 group_inequality=Group_with_GINI$Gini_Coefficient[Group_with_GINI$Treatment == "Inequality"]
-
 wilcox.test(group_inequality,group_baseline, data = Group_with_GINI, alternative="greater")
 
 #Median
@@ -986,7 +963,7 @@ median(group_inequality)
 #Boxplots
 Gini=ggplot(Group_with_GINI,aes(x=Treatment,y=Gini_Coefficient))+geom_boxplot()+ theme_apa()+labs(y="Gini", x="Treatment",title="All groups")+geom_boxplot(fill =c("steelblue","#D95F02"))
 
-####################################only groups that crossed the threshold####################################
+################################################only groups that crossed the threshold############################################
 
 #Only threshold crossed
 data_threshold=data %>%
@@ -1022,7 +999,7 @@ Gini_threshold=ggplot(Group_with_GINI_thres,aes(x=Treatment,y=Gini_Coefficient_h
 # Arrange the boxplots side by side with a separation line
 grid.arrange(Gini,Gini_threshold, ncol = 2, widths = c(1, 1), heights = c(1, 1))
 
-#########################################Hypothesis 5##############################################
+############################################################Hypothesis 5##################################################################
 
 #Check normality 
 normality_communication = lapply(group_names, function(grouping) shapiro.test(group$Communication_combined[group$Treatment== grouping]))
@@ -1042,7 +1019,7 @@ median_communication = group %>%
   group_by(Treatment) %>%
   summarise(Median = median(Communication_combined))
 
-#####Relation to Cooperation and Threshold Crossings########
+#####Relation to Cooperation and Threshold Crossings
 
 group_communicating= group %>%
   dplyr::select(Communicating,Cooperation_combined,Complex_dynamics_average,Error_rate_average)
@@ -1089,7 +1066,7 @@ boxplot_comm=ggplot(group_communicating,aes(x=Communicating,y=Cooperation_combin
 #Arrange next to another 
 grid.arrange(boxplot_comm,bar_chart_threshold_comm, ncol = 2, widths = c(1, 1), heights = c(1, 1))
 
-######################Cooperation and Threshold Crossing##############################################
+#####################################################Cooperation and Threshold Crossing##############################################
 
 model_threshold=glm(Threshold_crossed~Cooperation_combined+WEIRD_index+Average_age+Gender_composition, data = group,family = binomial)
 summary(model_threshold)
@@ -1236,7 +1213,7 @@ test_scores = Map_func_statistic(significant_survey)
 
 merge(p_values, test_scores, by = "ind", suffix = c("_pvalue", "_wilcox_statistic"))
 
-##############################################Group Level#####################################################################
+#########################################################Group Level#####################################################################
 
 #Check normality 
 survey_group=group[ , c(5:203)]  
@@ -1293,7 +1270,7 @@ export = print(Survey_table_group, showAllLevels = T, exact= c("Group_familarity
 ## Save to a CSV file
 write.csv(export, file = "Survey_differences_group.csv")
 
-#################################Group efficacy, Discussion, Trust############################################
+########################################################Group efficacy, Discussion, Trust############################################
 
 model_group_efficacy = lm(Groupefficacy_average~ Treatment+Cooperation_combined+WEIRD_index+Average_age, data = group)
 summary(model_group_efficacy)
@@ -1341,7 +1318,6 @@ library(lmtest)
 robust_test_efficacy = coeftest(model_efficacy_2, vcov_clust)
 print(robust_test_efficacy)
 
-#Check model assumptions 
 #Check Assumptions 
 par(mfrow=c(2,2))
 plot(model_efficacy_2, which=1:4)
@@ -1376,7 +1352,6 @@ robust_se_model_discussions = coeftest(model_discussions, vcov = sandwich)
 #Print the results
 print(robust_se_model_discussions)
 
-#Check model assumptions 
 #Check Assumptions 
 par(mfrow=c(2,2))
 plot(model_discussions, which=1:4)
@@ -1401,8 +1376,7 @@ plot(model_discussions,5)
 #6.Multicollinearity
 vif(model_discussions)
 
-##Trust in group ###
-
+##Trust in group 
 model_trust = lm(Trusted_group_average~ Treatment+Cooperation_combined+Average_age+WEIRD_index, data = group)
 summary(model_trust)
 
@@ -1412,7 +1386,6 @@ robust_se_model_trust = coeftest(model_trust, vcov = sandwich)
 # Print the results
 print(robust_se_model_trust)
 
-#Check model assumptions 
 #Check Assumptions 
 par(mfrow=c(2,2))
 plot(model_trust, which=1:4)
@@ -1437,7 +1410,7 @@ plot(model_trust,5)
 #6.Multicollinearity
 vif(model_trust)
 
-#########################################Emotions################################################
+##############################################################################Emotions################################################
 
 emotions_individual= data %>%
   dplyr::select(Treatment,Outrage,Guilt,Fear,Envy,Pride,Compassion)
@@ -1494,7 +1467,6 @@ wilcox.test(Outrage_average ~ Treatment, data = group)
 # Perform Wilcoxon rank-sum test for two treatments
 wilcox.test(Pride_average ~ Treatment, data = group)
 
-############################################
 #with GINI 
 model_envy_Gini = lm(Envy_average~ Treatment+Gini_Coefficient+WEIRD_index +Gender_composition+Average_age, data = Group_with_GINI)
 summary(model_envy_Gini)
@@ -1614,7 +1586,7 @@ print(Table_one_emotion,nonnormal=c("Envy","Guilt","Outrage","Pride"))
 emotions_only_crossed= emotions_threshold  %>%
   filter (Threshold ==1)
 
-##################################################Exploration Communication#################
+##################################################Exploration Communication#############################################################
 
 #Communicating vs. non-communicating groups - differences on Survey variables 
 #Check normality 
