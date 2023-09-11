@@ -1,4 +1,4 @@
-# Required Packages
+#Required Packages
 library("ggplot2")       # Hadley Wickham (2016). ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New York.
 library("ggsci")         # Nan Xiao (2018). ggsci: Scientific Journal and Sci-Fi Themed Color Palettes for 'ggplot2'. R package version 2.9.
 library("dplyr")         # Hadley Wickham, Romain François, Lionel Henry, Kirill Müller, and R Core Team (2021). dplyr: A Grammar of Data Manipulation. R package version 1.0.7.
@@ -188,10 +188,10 @@ tableone = CreateTableOne(data=summary, vars = c("Age","Gender","WEIRD_country",
 print(tableone,showAllLevels = TRUE, nonnormal = c("Age","Inequality_aversion","Total_payoff","Disadvantageous_inequality_aversion","Advantageous_inequality_aversion","Error_rate"),exact= c("Gender","Education","WEIRD_country"))
 
 #Summary Table Participant Pool group-level 
-summary2=group %>% 
+summary_group=group %>%
   dplyr::select(c("Average_age","Treatment","Gender_composition","WEIRD_index", "Average_education","Group_economics","Inequality_aversion_average","Disadvantageous_inequality_aversion_average","Advantageous_inequality_aversion_average","Error_rate_average","Average_individual_payoff"))
 
-tableone_group = CreateTableOne(data=summary2, vars = c("Average_age","Gender_composition","WEIRD_index", "Average_education","Group_economics","Inequality_aversion_average","Disadvantageous_inequality_aversion_average","Advantageous_inequality_aversion_average","Error_rate_average","Average_individual_payoff"),
+tableone_group = CreateTableOne(data=summary_group, vars = c("Average_age","Gender_composition","WEIRD_index", "Average_education","Group_economics","Inequality_aversion_average","Disadvantageous_inequality_aversion_average","Advantageous_inequality_aversion_average","Error_rate_average","Average_individual_payoff"),
                                  strata = "Treatment")
 
 print(tableone_group,showAllLevels = TRUE, nonnormal = c("Average_age","Gender_composition","WEIRD_index","Disadvantageous_inequality_aversion_average","Average_individual_payoff"))
@@ -277,6 +277,7 @@ print(summary_comprehension)
 
 wilcox.test(group$Disadvantageous_inequality_aversion_average, group$Advantageous_inequality_aversion_average, paired = TRUE,alternative="less")
 
+#Median and Mean
 mean(group$Disadvantageous_inequality_aversion_average)
 median(group$Disadvantageous_inequality_aversion_average)
 
@@ -516,7 +517,6 @@ separation_line = rectGrob(
 ## Arrange the plots vertically
 grid.arrange(plot_baseline, separation_line, plot_inequality, ncol = 1,heights = c(4, 0.2, 4))
 
-
 #######################################################Comparing Averages and Proportions on selected variables across treatment##################
 
 #Subset group data with needed variables 
@@ -590,6 +590,7 @@ chisq.test(Proportions$Treatment, Proportions$Depletion, correct=FALSE)
 chisq.test(Proportions$Treatment, Proportions$Communicating, correct=FALSE)
 
 #Fishers exact test
+
 #Overexploiting
 fisher.test(Table_Overexploiting)
 
@@ -641,7 +642,7 @@ bar_chart = ggplot(data_percentages, aes(x = Var1, y = Freq, fill = Threshold)) 
   geom_bar(stat = "identity", position = position_fill(reverse = F)) + theme_apa() +
   labs( x = "Group", y = "Percentage") +scale_fill_manual(values=c("#D95F02","steelblue"))
 
-#Chi-square  test 
+#Chi-square test 
 Proportions=group%>%
   dplyr::select(Treatment,Threshold_crossed,Depletion,Communicating,Overexploiting)
 
@@ -678,10 +679,10 @@ mean_by_treatment = group %>%
 
 #####################################################Hypothesis 2 ####################################################################
 
+#Only Inequality Data
 Data_inequality=data[data$Treatment=="Inequality",]
 View(Data_inequality)
 
-#Average harvest before threshold 
 #Check normality  
 group_names3=unique(Data_inequality$Harvest_restriction)
 
@@ -730,7 +731,7 @@ ggplot(average_deviations2, aes(x = Round, y = Optimal_Claim, group = Harvest_re
   labs(x = "Round", y = "Optimal Claim Difference",color="Adaptive Capacity") +
   scale_color_manual(values = c("LAC" = "steelblue", "HAC" = "#D95F02","Baseline"="purple")) +geom_hline(yintercept = 0, linetype = "dashed", color = "black")+scale_x_discrete(labels = round_labels)+theme_apa()
 
-###regression to account for group effects
+#regression to account for group effects
 
 # Fit regression model
 reg_inequality_harvest = lm(Average_harvest_threshold~ Harvest_restriction+WEIRD_country+Age+Gender.composition, data = Data_inequality)
@@ -930,9 +931,6 @@ axis(2)
 
 ##############################################################Hypothesis 4##########################################################
 
-#Calculate GINI for treatment with harvest before threshold but this is not a mean measure 
-gini_coefficients = tapply(data$Harvest_threshold, data$Treatment, Gini)
-
 #Calculate GINI for each group for harvest before threshold 
 gini_coefficients_groups = tapply(data$Harvest_threshold, data$Session, Gini)
 
@@ -972,6 +970,7 @@ data_threshold=data %>%
 group_threshold=group %>%
   filter(Threshold_crossed=="1")
 
+#Change name to session 
 names(group_threshold)[names(group_threshold) == "Group_session"] = "Session"
 
 #Calculate GINI for each group for harvest before threshold 
@@ -981,6 +980,7 @@ gini_data_threshold = data_threshold %>%
 
 Group_with_GINI_thres= merge(group_threshold, c(gini_data_threshold), by = "Session", all.x = TRUE)
 
+#Check normality
 normality_test_GINI_thres = lapply(group_names, function(grouping) shapiro.test(Group_with_GINI_thres$Gini_Coefficient_harvest[Group_with_GINI_thres$Treatment == grouping]))
 names(normality_test_GINI_thres) = group_names
 print(normality_test_GINI_thres)
@@ -1092,7 +1092,7 @@ head(predicted.classes)
 group_threshold= group %>%
   dplyr::select(Threshold_crossed,Cooperation_combined) 
 
-# Select only numeric predictors
+#Select only numeric predictors
 group_threshold_numeric = group_threshold %>%
   dplyr::select_if(is.numeric) 
 predictors = colnames(group_threshold_numeric)
@@ -1118,6 +1118,7 @@ ggplot(model.data, aes(index, .std.resid)) +
   geom_point(aes(color = group$Threshold_crossed), alpha = .5) +
   theme_apa()
 
+#Multicollinearity
 vif(model_threshold)
 
 #Pseudo R-squared
@@ -1139,79 +1140,6 @@ stargazer(survey1, type = "text", title="Descriptive statistics", digits=2, out=
                              "Education","Study Field Economics","How many people from your group did you know from before the start of the experiment",
                              "How many similar experiments have you been part of before","How many similar computer-based experiments have you been part of before","Importance of Instructions",
                              "Importance of Group Discussions","Our group made an agreement", "Our group communicated well","Group communication self-reported","Our group had a leader","It was important for myself to avoid the threshold","It was important for my group to avoid the threshold","Resource Dynamics Complexity","Our group managed to cooperate"," Our group shared the resource","Our group worked together","Group cooperation score","Group cooperation self-rated","Group identification","Trust in group","Importance of Fairness","The group was fair","The harvest restriction was fair","Group shared the harvest equally","I considered past decision of group members","I considered the impact of my choices on other group members","My own monetary gain was more important to me","I believe my action could affect the outcome of the game","I believe my contribution was just a drop in the ocean and insignificant","I believe there was little point in cooperation because others would not", "Self-efficacy score", "I believe that our group could, through joint effort, conserve the resource sustainably", "Outrage", "Guilt","Fear","Envy","Pride","Compassion","Contribution to Budget","Low-income","I only trust people I have known for a while","There are only few people I can trust completely","I think of myself as someone who can be trusted","General trust score","I prioritize individual over communal benefit","I believe that differences in people's living standards should be small","My actions reflect my beliefs regardless of social pressures"))
-
-#Check Normality for Survey Questions
-###Individual level
-#Survey data with treatment 
-survey3=data[ , c(7:268)]  
-survey3= subset(survey3, select= -c(2:193))
-
-#Only select numeric variables from dataset
-survey_numeric=survey3 %>% dplyr::select(Treatment,where(is.numeric))
-
-#Only Inequality 
-survey_inequality = survey_numeric[survey_numeric$Treatment=="Inequality",]
-survey_inequality = survey_inequality %>% dplyr::select(-Treatment)
-
-#Only Baseline
-survey_baseline = survey_numeric[survey_numeric$Treatment=="Baseline",]
-survey_baseline = survey_baseline %>% dplyr::select(-Treatment,-Fair_harvest_restriction)
-
-#Normality test for Survey Variables inequality 
-apply(survey_inequality,2,shapiro.test)
-
-#Normality test for Survey Variables baseline  
-apply(survey_baseline,2,shapiro.test)
-
-#Comparison of proportion and averages across treatment on Survey variables 
-#Individual-level
-
-Survey_table = CreateTableOne(data=survey3,vars = c("Age","Gender","WEIRD_country", "Education","Study_field_economics","Familarity_others","Familarity_experiments","Familarity_computer","Extra rounds","Instruction_feedback","Discussion_important","Group_agreed","Group_communication","Communication_self","Group_leader","Avoid_threshold","Group_avoid_threshold","Complex_dynamics","Managed_cooperation","Group_shared","Group_worked","Group_cooperation_score","Cooperation_self","Sessionentification","Trust_group","Fairness","Fair_group","Fair_shared_harvest","Considered_past","Considered_impact","Considered_money","Self_efficacy_Q1","Self_efficacy_Q2","Self_efficacy_Q3","Self_efficacy","Group_efficacy","Outrage","Guilt","Fear","Envy","Pride","Compassion","Budget","Income","Trust_1","Trust_2","Trust_3","General_trust","Individualism","Inequality","Autonomy"),
-                               strata = "Treatment",factorVars = c("WEIRD_country","Study_field_economics"))
-
-print(Survey_table, showAllLevels = T, exact= c("Gender","Education","Income"),nonnormal = c("Age","Familarity_others","Familarity_experiments","Familarity_computer","Instruction_feedback","Discussion_important","Group_agreed","Group_communication","Communication_self","Group_leader","Avoid_threshold","Group_avoid_threshold","Complex_dynamics","Managed_cooperation","Group_shared","Group_worked","Group_cooperation_score","Cooperation_self","Sessionentification","Trust_group","Fairness","Fair_group","Fair_shared_harvest","Considered_past","Considered_impact","Considered_money","Self_efficacy_Q1","Self-efficacy_Q2","Self_efficacy_Q3","Self_efficacy","Group_efficacy","Outrage","Guilt","Fear","Envy","Pride","Compassion","Budget","Trust_1","Trust_2","Trust_3","General_trust","Individualism","Inequality","Autonomy"))
-
-####Double-check using Man-Whitney U test for continuous variables 
-
-#exclude categorical variables 
-survey_numeric1=subset(survey_numeric, select= -c(Fair_harvest_restriction))
-
-Map_func_pvalues = function(survey_numeric1) {
-  tmp = split(survey_numeric1, survey_numeric1$Treatment)
-  stack(Map(function(x, y) wilcox.test(x, y, exact = FALSE)$p.value, tmp[[1]][-1], tmp[[2]][-1]))
-}
-p_values = Map_func_pvalues(survey_numeric1)
-
-Map_func_statistic = function(survey_numeric1) {
-  tmp = split(survey_numeric1, survey_numeric1$Treatment)
-  stack(Map(function(x, y) wilcox.test(x, y, exact = FALSE)$statistic, tmp[[1]][-1], tmp[[2]][-1]))
-}
-test_scores = Map_func_statistic(survey_numeric1)
-
-#Mann-Whitney Tests for all Survey variables that are continuous as all variables are non-normally distributed 
-
-merge(p_values, test_scores, by = "ind", suffix = c("_pvalue", "_wilcox_statistic"))
-
-#Only significant differences at 0.05 significance 
-Table_survey_significant=CreateTableOne(data=survey_numeric,vars=c("Discussion_important","Trust_group","Group_efficacy","Envy","Compassion"),strata="Treatment")
-print(Table_survey_significant,nonnormal=c("Discussion_important","Trust_group","Group_efficacy","Envy","Compassion" ))
-
-#Mann-Whitney Test for multiple survey variables that are significant 
-significant_survey=survey3[,c("Treatment","Discussion_important","Trust_group","Group_efficacy","Envy","Compassion")]
-
-Map_func_pvalues = function(significant_survey) {
-  tmp = split(significant_survey, significant_survey$Treatment)
-  stack(Map(function(x, y) wilcox.test(x, y, exact = FALSE)$p.value, tmp[[1]][-1], tmp[[2]][-1]))
-}
-p_values = Map_func_pvalues(significant_survey)
-
-Map_func_statistic = function(significant_survey) {
-  tmp = split(significant_survey, significant_survey$Treatment)
-  stack(Map(function(x, y) wilcox.test(x, y, exact = FALSE)$statistic, tmp[[1]][-1], tmp[[2]][-1]))
-}
-test_scores = Map_func_statistic(significant_survey)
-
-merge(p_values, test_scores, by = "ind", suffix = c("_pvalue", "_wilcox_statistic"))
 
 #########################################################Group Level#####################################################################
 
@@ -1272,6 +1200,7 @@ write.csv(export, file = "Survey_differences_group.csv")
 
 ########################################################Group efficacy, Discussion, Trust############################################
 
+#Group-efficacy Model 
 model_group_efficacy = lm(Groupefficacy_average~ Treatment+Cooperation_combined+WEIRD_index+Average_age, data = group)
 summary(model_group_efficacy)
 
@@ -1342,7 +1271,8 @@ plot(model_efficacy_2,5)
 #6.Multicollinearity
 vif(model_efficacy_2)
 
-####Importance Discussions
+#Importance Discussions Model
+
 model_discussions = lm(Discussion_important_average~ Treatment+Cooperation_combined+WEIRD_index+Average_age, data = group)
 summary(model_discussions)
 
@@ -1376,7 +1306,8 @@ plot(model_discussions,5)
 #6.Multicollinearity
 vif(model_discussions)
 
-##Trust in group 
+#Trust in group Model
+
 model_trust = lm(Trusted_group_average~ Treatment+Cooperation_combined+Average_age+WEIRD_index, data = group)
 summary(model_trust)
 
@@ -1471,6 +1402,9 @@ wilcox.test(Pride_average ~ Treatment, data = group)
 model_envy_Gini = lm(Envy_average~ Treatment+Gini_Coefficient+WEIRD_index +Gender_composition+Average_age, data = Group_with_GINI)
 summary(model_envy_Gini)
 
+#Robust SEs
+coeftest(model_envy_Gini, vcov = vcovHC(model_envy_Gini, type="HC3"))
+
 #Check assumptions
 par(mfrow=c(2,2))
 plot(model_envy_Gini,which=1:4)
@@ -1494,10 +1428,6 @@ plot(model_envy_Gini,5)
 
 #6.Multicollinearity 
 vif(model_envy_Gini)
-
-#Robust SEs to account for heteroskedasticity 
-#Gini envy model
-coeftest(model_envy_Gini, vcov = vcovHC(model_envy_Gini, type="HC3"))
 
 ###Compare Emotions across groups that cross or do not cross threshold 
 
@@ -1544,7 +1474,7 @@ print(normality_test_fear)
 normality_test_outrage = lapply(group_names4, function(grouping) shapiro.test(emotions_threshold$Outrage[emotions_threshold$Threshold == grouping]))
 names(normality_test_outrage) = group_names4
 print(normality_test_outrage)
-#not normal in not crossed group 
+
 
 #Pride
 normality_test_pride = lapply(group_names4, function(grouping) shapiro.test(emotions_threshold$Pride[emotions_threshold$Threshold == grouping]))
